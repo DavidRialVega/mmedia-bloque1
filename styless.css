@@ -5,7 +5,7 @@
     border: 1px solid black;
 }
 
-#gamelayer{
+.gamelayer{
     width: 640px;
     height: 480px;
     position: absolute;
@@ -20,4 +20,58 @@
 #gamestartscreen img{
     margin: 10px;
     cursor: pointer;/*especificar el cursor del raton como se va a  apuntar*/
+}
+
+#levelselectscreen{
+    padding-top: 150px;
+    padding-left: 50px;
+}
+
+#levelselectscreen input{
+    margin: 20px;
+    cursor: pointer;
+    background: url(images/icons/level.png) no-repeat;
+    color: yellow;
+    font-size: 20px;
+    width: 64px;
+    height: 64px;
+    border: 0;
+}
+
+#loadingscreen {
+    background: rgba(100,100,100,0.3);
+}
+
+#loadingmessage{
+    margin-top: 400px;
+    text-align: center;
+    height: 48px;
+    color: white;
+    background: url(images/loader.gif) no-repeat center;
+    font: 12px Arial;
+}
+
+#scorescreen {
+    height: 60px;
+    font: 32px Comics Sans MS;
+    text-shadow: 0 0 2px #000;
+    color: white;
+}
+
+#scorescreen img{
+    opacity: 0.6;
+    top: 10px;
+    position: relative;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+#scorescreen #score {
+    position: absolute;
+    top: 5px;
+    right: 20px;
+}
+
+#endingscreen{
+    text-align: center;
 }
