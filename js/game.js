@@ -117,32 +117,66 @@ var game={
         game.context.drawImage(game.currentLevel.foregroundImage, game.offsetLeft, 0, 640, 480, 0, 0, 640, 480);
 
         game.context.drawImage(game.slingshotImage, game.slingshotX - game.offsetLeft, game.slingshotY);
+        game.drawAllBodies();
         game.context.drawImage(game.slingshotFrontImage, game.slingshotX - game.offsetLeft, game.slingshotY);
 
         if(!game.ended){
             game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
         }
+    },
+
+    drawAllBodies:function(){
+        box2d.world.DrawDebugData();
     }
 }
 
 var levels={
-    //nivel de datos
     data:[
-        {
-            //primer nivel
-            foreground:'desert-foreground',
-            background:'clouds-background',
-            entities:[]
-        },
-        {
-            //segundo nivel
-            foreground:'desert-foreground',
-            background:'clouds-background',
-            entities:[
-                {type:"block", name:"wood", x:520,y:375,angle:90},
-                {type:"villain", name:"burger",x:520,y:200,calories:90},
+        { //primer nivel
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+                {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+                {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
+        
+                {type:"block", name:"wood", x:520,y:380,angle:90,width:100,height:25},
+                {type:"block", name:"glass", x:520,y:280,angle:90,width:100,height:25},
+                {type:"villain", name:"burger",x:520,y:205,calories:590},
+        
+                {type:"block", name:"wood", x:620,y:380,angle:90,width:100,height:25},
+                {type:"block", name:"glass", x:620,y:280,angle:90,width:100,height:25},
+                {type:"villain", name:"fries", x:620,y:205,calories:420},
+        
+                {type:"hero", name:"orange",x:80,y:405},
+                {type:"hero", name:"apple",x:140,y:405},
             ]
-        }
+        },
+          { //segundo nivel
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+                {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+                {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
+            
+                {type:"block", name:"wood", x:820,y:380,angle:90,width:100,height:25},
+                {type:"block", name:"wood", x:720,y:380,angle:90,width:100,height:25},
+                {type:"block", name:"wood", x:620,y:380,angle:90,width:100,height:25},
+                {type:"block", name:"glass", x:670,y:317.5,width:100,height:25},
+                {type:"block", name:"glass", x:770,y:317.5,width:100,height:25},        
+        
+                {type:"block", name:"glass", x:670,y:255,angle:90,width:100,height:25},
+                {type:"block", name:"glass", x:770,y:255,angle:90,width:100,height:25},
+                {type:"block", name:"wood", x:720,y:192.5,width:100,height:25}, 
+        
+                {type:"villain", name:"burger",x:715,y:155,calories:590},
+                {type:"villain", name:"fries",x:670,y:405,calories:420},
+                {type:"villain", name:"sodacan",x:765,y:400,calories:150},
+        
+                {type:"hero", name:"strawberry",x:30,y:415},
+                {type:"hero", name:"orange",x:80,y:405},
+                {type:"hero", name:"apple",x:140,y:405},
+            ]
+          }
     ],
 
     init:function(){
@@ -159,6 +193,7 @@ var levels={
         });
     },
     load:function(number){
+        box2d.init();
         game.currentLevel = {number: number, hero: []};
         game.score = 0;
         $('#score').html('Score: ' + game.score);
@@ -168,7 +203,11 @@ var levels={
         game.currentLevel.foregroundImage = loader.loadImage("images/backgrounds/" + level.foreground + ".png");
         game.slingshotImage = loader.loadImage("images/slingshot.png");
         game.slingshotFrontImage = loader.loadImage("images/slingshot-front.png");
-
+        for (var i = level.entities.length - 1; i >= 0; i--){
+            var entity = level.entities[i];
+            entities.create(entity);
+          };
+          
         if(loader.loaded){
             game.start();
         }else {
@@ -327,10 +366,121 @@ var entities = {
       }
     },
 
-    create:function(enttity){
-
-    },
+    create : function(entity){
+        var definition = entities.definitions[entity.name];
+        if(!definition){
+          console.log("Undefined entity name",entity.name);
+          return;
+        }
+        switch(entity.type){
+          case "block":
+            entity.health = definition.fullHealth;
+            entity.fullHealth = definition.fullHealth;
+            entity.shape = "rectangle"; 
+            entity.sprite = loader.loadImage("images/entities/"+entity.name+".png");
+            entity.breakSound = game.breakSound[entity.name];
+            box2d.createRectangle(entity, definition);
+            break;
+          case "ground":     
+            entity.shape = "rectangle";    
+            box2d.createRectangle(entity, definition);
+            break;
+          case "hero":            
+          case "villain": 
+            entity.health = definition.fullHealth;
+            entity.fullHealth = definition.fullHealth;
+            entity.sprite = loader.loadImage("images/entities/"+entity.name+".png");
+            entity.shape = definition.shape;
+            entity.bounceSound = game.bounceSound;
+            if(definition.shape == "circle"){
+              entity.radius = definition.radius;
+              box2d.createCircle(entity, definition);
+            } else if(definition.shape == "rectangle"){
+              entity.width = definition.width;
+              entity.height = definition.height;
+              box2d.createRectangle(entity, definition);
+            }
+            break;
+          default:
+            console.log("Undefined entity type", entity.type);
+            break;
+        }
+      },
+      
     draw:function(enttity,position,angle){
 
     }
+}
+
+var box2d = {
+    scale : 30,
+    init : function(){
+        var gravity = new b2Vec2(0,9.8);
+        var allowSleep = true;
+        box2d.world = new b2World(gravity, allowSleep);
+
+        var debugContext = document.getElementById('debugcanvas').getContext('2d');
+        var debugDraw = new b2DebugDraw();
+        debugDraw.SetSprite(debugContext);
+        debugDraw.SetDrawScale(box2d.scale);
+        debugDraw.SetFillAlpha(0.3);
+        debugDraw.SetLineThickness(1.0);
+        debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+        box2d.world.SetDebugDraw(debugDraw);
+    },
+        createRectangle : function(entity, definition){
+            var bodyDef = new b2BodyDef;
+            if(entity.isStatic){
+                bodyDef.type = b2Body.b2_staticBody;
+            } else {
+                bodyDef.type = b2Body.b2_dynamicBody;
+            }
+        
+            bodyDef.position.x = entity.x / box2d.scale;
+            bodyDef.position.y = entity.y / box2d.scale;
+            if (entity.angle) {
+                bodyDef.angle = Math.PI*entity.angle / 180;
+            }
+        
+            var fixtureDef = new b2FixtureDef;
+            fixtureDef.density = definition.density;
+            fixtureDef.friction = definition.friction;
+            fixtureDef.restitution = definition.restitution;
+        
+            fixtureDef.shape = new b2PolygonShape;
+            fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale, entity.height/2/box2d.scale);
+        
+            var body = box2d.world.CreateBody(bodyDef);
+            body.SetUserData(entity);
+        
+            var fixture = body.CreateFixture(fixtureDef);
+            return body;
+    },
+  
+        createCircle : function(entity, definition){
+            var bodyDef = new b2BodyDef;
+            if (entity.isStatic){
+                bodyDef.type = b2Body.b2_staticBody;
+            } else {
+                bodyDef.type = b2Body.b2_dynamicBody;
+            }
+            bodyDef.position.x = entity.x / box2d.scale;
+            bodyDef.position.y = entity.y / box2d.scale;
+        
+            if(entity.angle){
+                bodyDef.angle = Math.PI * entity.angle/180;
+            }
+            var fixtureDef = new b2FixtureDef;
+            fixtureDef.density = definition.density;
+            fixtureDef.friction = definition.friction;
+            fixtureDef.restitution = definition.restitution;
+        
+            fixtureDef.shape = new b2CircleShape(entity.radius/box2d.scale);
+        
+            var body = box2d.world.CreateBody(bodyDef);
+            body.SetUserData(entity);
+        
+            var fixture = body.CreateFixture(fixtureDef);
+            return body;
+    },    
 }
