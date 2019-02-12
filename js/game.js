@@ -127,6 +127,25 @@ var game={
 
     drawAllBodies:function(){
         box2d.world.DrawDebugData();
+
+        for(var body = box2d.world.GetBodyList(); body; body = body.GetNext()){
+            var entity = body.GetUserData();
+            if(entity){
+                var entityX = body.GetPosition().x * box2d.scale;
+                if(entityX < 0 || entityX > game.currentLevel.foregroundImage.width || (entity.health && entity.health < 0)){
+                    box2d.world.DestroyBody(body);
+                    if(entity.type == "villain"){
+                        game.score += entity.calories;
+                        $('#score').html('Score: ' + game.score);
+                    }
+                    if(entity.breakSound){
+                        entity.breakSound.play();
+                    }
+                } else{
+                    entities.draw(entity, body.GetPosition(), body.GetAngle());
+                }
+            }
+        }
     }
 }
 
@@ -363,6 +382,30 @@ var entities = {
         density : 2.0,
         friction : 0.5,
         restitution : 0.4,
+      },
+      draw: function(entity, position, angle){
+        game.context.translate(position.x * box2d.scale - game.offsetLeft, position.y * box2d.scale);
+        game.context.rotate(angle);
+        switch (entity.type){
+            case "block":
+                game.context.drawImage(entity.sprite, 0, 0, entity.sprite.width, entity.sprite.height, 
+                    -entity.width / 2 - 1, -entity.height / 2 - 1, entity.width + 2, entity.height + 2);
+                break;
+            case "villain":
+            case "hero":
+                if(entity.shape == "circle"){
+                    game.context.drawImage(entity.sprite, 0, 0, entity.sprite.width, entity.sprite.height,
+                        -entity.radius - 1. -entity.radius - 1, entity.radius * 2 + 2, entity.radius * 2 + 2);
+                } else if(entity.shape){
+                    game.context.drawImage(entity.sprite, 0, 0, entity.sprite.width, entity.sprite.height, 
+                        -entity.width / 2 - 1, -entity.height / 2 - 1, entity.width + 2, entity.height + 2);
+                }
+                break;
+            case "ground":
+            break;            
+        }
+        game.context.rotate(-angle);
+        game.context.translate(-position.x * box2d.scale + game.offsetLeft, -position.y * box2d.scale);
       }
     },
 
@@ -378,7 +421,7 @@ var entities = {
             entity.fullHealth = definition.fullHealth;
             entity.shape = "rectangle"; 
             entity.sprite = loader.loadImage("images/entities/"+entity.name+".png");
-            entity.breakSound = game.breakSound[entity.name];
+            //entity.breakSound = game.breakSound[entity.name];
             box2d.createRectangle(entity, definition);
             break;
           case "ground":     
@@ -428,59 +471,59 @@ var box2d = {
         debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
         box2d.world.SetDebugDraw(debugDraw);
     },
-        createRectangle : function(entity, definition){
-            var bodyDef = new b2BodyDef;
-            if(entity.isStatic){
-                bodyDef.type = b2Body.b2_staticBody;
-            } else {
-                bodyDef.type = b2Body.b2_dynamicBody;
-            }
-        
-            bodyDef.position.x = entity.x / box2d.scale;
-            bodyDef.position.y = entity.y / box2d.scale;
-            if (entity.angle) {
-                bodyDef.angle = Math.PI*entity.angle / 180;
-            }
-        
-            var fixtureDef = new b2FixtureDef;
-            fixtureDef.density = definition.density;
-            fixtureDef.friction = definition.friction;
-            fixtureDef.restitution = definition.restitution;
-        
-            fixtureDef.shape = new b2PolygonShape;
-            fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale, entity.height/2/box2d.scale);
-        
-            var body = box2d.world.CreateBody(bodyDef);
-            body.SetUserData(entity);
-        
-            var fixture = body.CreateFixture(fixtureDef);
-            return body;
+    createRectangle : function(entity, definition){
+        var bodyDef = new b2BodyDef;
+        if(entity.isStatic){
+            bodyDef.type = b2Body.b2_staticBody;
+        } else {
+            bodyDef.type = b2Body.b2_dynamicBody;
+        }
+    
+        bodyDef.position.x = entity.x / box2d.scale;
+        bodyDef.position.y = entity.y / box2d.scale;
+        if (entity.angle) {
+            bodyDef.angle = Math.PI*entity.angle / 180;
+        }
+    
+        var fixtureDef = new b2FixtureDef;
+        fixtureDef.density = definition.density;
+        fixtureDef.friction = definition.friction;
+        fixtureDef.restitution = definition.restitution;
+    
+        fixtureDef.shape = new b2PolygonShape;
+        fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale, entity.height/2/box2d.scale);
+    
+        var body = box2d.world.CreateBody(bodyDef);
+        body.SetUserData(entity);
+    
+        var fixture = body.CreateFixture(fixtureDef);
+        return body;
     },
-  
-        createCircle : function(entity, definition){
-            var bodyDef = new b2BodyDef;
-            if (entity.isStatic){
-                bodyDef.type = b2Body.b2_staticBody;
-            } else {
-                bodyDef.type = b2Body.b2_dynamicBody;
-            }
-            bodyDef.position.x = entity.x / box2d.scale;
-            bodyDef.position.y = entity.y / box2d.scale;
-        
-            if(entity.angle){
-                bodyDef.angle = Math.PI * entity.angle/180;
-            }
-            var fixtureDef = new b2FixtureDef;
-            fixtureDef.density = definition.density;
-            fixtureDef.friction = definition.friction;
-            fixtureDef.restitution = definition.restitution;
-        
-            fixtureDef.shape = new b2CircleShape(entity.radius/box2d.scale);
-        
-            var body = box2d.world.CreateBody(bodyDef);
-            body.SetUserData(entity);
-        
-            var fixture = body.CreateFixture(fixtureDef);
-            return body;
+
+    createCircle : function(entity, definition){
+        var bodyDef = new b2BodyDef;
+        if (entity.isStatic){
+            bodyDef.type = b2Body.b2_staticBody;
+        } else {
+            bodyDef.type = b2Body.b2_dynamicBody;
+        }
+        bodyDef.position.x = entity.x / box2d.scale;
+        bodyDef.position.y = entity.y / box2d.scale;
+    
+        if(entity.angle){
+            bodyDef.angle = Math.PI * entity.angle/180;
+        }
+        var fixtureDef = new b2FixtureDef;
+        fixtureDef.density = definition.density;
+        fixtureDef.friction = definition.friction;
+        fixtureDef.restitution = definition.restitution;
+    
+        fixtureDef.shape = new b2CircleShape(entity.radius/box2d.scale);
+    
+        var body = box2d.world.CreateBody(bodyDef);
+        body.SetUserData(entity);
+    
+        var fixture = body.CreateFixture(fixtureDef);
+        return body;
     },    
 }
