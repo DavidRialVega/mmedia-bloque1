@@ -144,8 +144,6 @@ var game={
                 game.mode = "fired";
                 game.slingshotReleasedSound.play();
                 var impulseScaleFactor = 0.75;
-                var slingshotCenterX=game.slingshotX+35;
-                var slingshotCenterY=game.slingshotY+25;
                 var impulse = new b2Vec2((game.slingshotX+35-mouse.x-game.offsetLeft)*impulseScaleFactor,
                 (game.slingshotY+25-mouse.y)*impulseScaleFactor);
                 game.currentHero.ApplyImpulse(impulse, game.currentHero.GetWorldCenter());
@@ -255,7 +253,7 @@ var game={
         }
         var position = game.currentHero.GetPosition();
         var distanceSquared = Math.pow(position.x*box2d.scale - mouse.x - game.offsetLeft,2)
-          + Math.pow(position.y*box2d.scale-mouse.y,2);
+        + Math.pow(position.y*box2d.scale-mouse.y,2);
         var radiusSquared = Math.pow(game.currentHero.GetUserData().radius,2);
         return (distanceSquared <= radiusSquared);
       },
@@ -485,7 +483,7 @@ var mouse = {
         var offset = $('#gamecanvas').offset();
 
         mouse.x = ev.pageX - offset.left;
-        mouse.y = ev.pagey - offset.top;
+        mouse.y = ev.pageY - offset.top;
 
         if(mouse.down){
             mouse.dragging = true;
