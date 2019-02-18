@@ -354,7 +354,7 @@ var levels={
                 {type:"hero", name:"apple",x:140,y:405},
             ]
         },
-          { //segundo nivel
+        { //segundo nivel
             foreground : 'desert-foreground',
             background : 'clouds-background',
             entities : [
@@ -379,9 +379,52 @@ var levels={
                 {type:"hero", name:"orange",x:80,y:405},
                 {type:"hero", name:"apple",x:140,y:405},
             ]
-          }
-    ],
+        },
+        { // tercer nivel
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+            {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+            {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
+    
+            {type:"block", name:"glass", x:820,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:720,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:620,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:670,y:317.5,width:100,height:25},
+            {type:"block", name:"glass", x:770,y:317.5,width:100,height:25}, 
 
+            {type:"block", name:"wood", x:670,y:300,angle:90,width:100,height:25},
+            {type:"block", name:"wood", x:770,y:300,angle:90,width:100,height:25},
+            {type:"block", name:"wood", x:720,y:240,width:150,height:25},
+                 
+    
+            {type:"block", name:"wood", x:500,y:380,angle:90,width:300,height:25},
+            {type:"block", name:"wood", x:900,y:380,angle:90,width:300,height:25},
+            {type:"block", name:"wood", x:750,y:150,width:600,height:25},
+            
+            {type:"villain", name:"burger",x:670,y:405,calories:420},
+            {type:"villain", name:"fries",x:765,y:400,calories:150},
+            {type:"villain", name:"sodacan",x:720,y:270,calories:400},
+    
+            {type:"hero", name:"strawberry",x:30,y:415},
+            {type:"hero", name:"pineapple",x:80,y:415},
+            ],
+        },
+        {  // cuarto nivel
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+          
+            ],
+        },
+        { //quinto nivel           
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+           
+          ],
+        }
+    ],
     init:function(){
         var html="";
         for (var  i = 0; i < levels.data.length; i++) {
