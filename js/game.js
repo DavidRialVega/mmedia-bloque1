@@ -52,6 +52,11 @@ var game={
         game.canvas = $('#gamecanvas')[0];
         game.context = game.canvas.getContext('2d');
     },
+
+    showSoundButton : function(){
+        $('#soundbutton').show('slow');
+    },
+
     showLevelScreen: function(){
         $('.gamelayer').hide();
         $('#levelselectscreen').show('slow');
@@ -60,14 +65,18 @@ var game={
     slingshotX: 140,
     slingshotY: 280,
     start: function(){
-        $('.gamelayer').hide();
+      
+        $('.gameLayer').hide();       
         $('#gamecanvas').show();
         $('#scorescreen').show();
-
+        $('#endingscreen').hide();
+      
+      
+        
         game.mode = "intro";
         game.offsetLeft = 0;
         game.ended = false;
-        game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
+        game.animationFrame = window.requestAnimationFrame(game.animate,game.canvas);
     },
     maxSpeed: 3,
     minOffset: 0,
@@ -125,10 +134,6 @@ var game={
             }else {
                 game.panTo(game.slingshotX);
             }
-        }
-
-        if(game.mode == "load-next-hero"){
-            game.mode = "wait-for-firing";
         }
 
         if(game.mode == "firing"){
@@ -573,7 +578,7 @@ var entities = {
           return;
         }
         switch(entity.type){
-          case "block":
+            case "block":
             entity.health = definition.fullHealth;
             entity.fullHealth = definition.fullHealth;
             entity.shape = "rectangle"; 
@@ -581,11 +586,12 @@ var entities = {
             entity.breakSound = game.breakSound[entity.name];
             box2d.createRectangle(entity, definition);
             break;
-          case "ground":     
-            entity.shape = "rectangle";    
+          case "ground":
+            entity.shape = "rectangle";
             box2d.createRectangle(entity, definition);
             break;
-          case "hero":            
+          case "hero":
+            
           case "villain": 
             entity.health = definition.fullHealth;
             entity.fullHealth = definition.fullHealth;
@@ -607,8 +613,30 @@ var entities = {
         }
       },
       
-    draw:function(enttity,position,angle){
+    draw:function(entity,position,angle){
+        game.context.translate(position.x*box2d.scale-game.offsetLeft, position.y*box2d.scale);
+        game.context.rotate(angle);
+        switch (entity.type){
+        case "block":
+            game.context.drawImage(entity.sprite,0,0,entity.sprite.width,entity.sprite.height,
+                -entity.width/2-1,-entity.height/2-1,entity.width+2,entity.height+2); 
+        break;
+        case "villain":
+        case "hero":
+            if (entity.shape == "circle") {
+            game.context.drawImage(entity.sprite,0,0,entity.sprite.width,entity.sprite.height,
+                -entity.radius-1,-entity.radius-1,entity.radius*2+2,entity.radius*2+2); 
+            } else if (entity.shape=="rectangle") {
+            game.context.drawImage(entity.sprite,0,0,entity.sprite.width,entity.sprite.height,
+                -entity.width/2-1,-entity.height/2-1,entity.width+2,entity.height+2);
+            }
+        break;
+        case "ground":
+        break;
+        }
 
+        game.context.rotate(-angle);
+        game.context.translate(-position.x*box2d.scale+game.offsetLeft,-position.y*box2d.scale);
     }
 }
 var b2Vec2 = Box2D.Common.Math.b2Vec2;
