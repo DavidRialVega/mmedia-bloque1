@@ -112,6 +112,14 @@ var game={
     },
     animate: function(){
         game.handlePanning();
+
+        var currentTime = new Date().getTime();
+        var timeStep;
+        if (game.lastUpdateTime){
+            timeStep = (currentTime - game.lastUpdateTime)/1000;
+            box2d.step(timeStep);
+        }
+        game.lastUpdateTime = currentTime; 
         
         game.context.drawImage(game.currentLevel.backgroundImage, game.offsetLeft/4,0,640,480,0,0,640,480);
         game.context.drawImage(game.currentLevel.foregroundImage, game.offsetLeft, 0, 640, 480, 0, 0, 640, 480);
@@ -454,6 +462,15 @@ var entities = {
 
     }
 }
+var b2Vec2 = Box2D.Common.Math.b2Vec2;
+var b2BodyDef = Box2D.Dynamics.b2BodyDef;
+var b2Body = Box2D.Dynamics.b2Body;
+var b2FixtureDef = Box2D.Dynamics.b2FixtureDef;
+var b2Fixture = Box2D.Dynamics.b2Fixture;
+var b2World = Box2D.Dynamics.b2World;
+var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
 
 var box2d = {
     scale : 30,
@@ -499,31 +516,37 @@ var box2d = {
         var fixture = body.CreateFixture(fixtureDef);
         return body;
     },
-
-    createCircle : function(entity, definition){
-        var bodyDef = new b2BodyDef;
-        if (entity.isStatic){
-            bodyDef.type = b2Body.b2_staticBody;
-        } else {
-            bodyDef.type = b2Body.b2_dynamicBody;
-        }
-        bodyDef.position.x = entity.x / box2d.scale;
-        bodyDef.position.y = entity.y / box2d.scale;
-    
-        if(entity.angle){
-            bodyDef.angle = Math.PI * entity.angle/180;
-        }
-        var fixtureDef = new b2FixtureDef;
-        fixtureDef.density = definition.density;
-        fixtureDef.friction = definition.friction;
-        fixtureDef.restitution = definition.restitution;
-    
-        fixtureDef.shape = new b2CircleShape(entity.radius/box2d.scale);
-    
-        var body = box2d.world.CreateBody(bodyDef);
-        body.SetUserData(entity);
-    
-        var fixture = body.CreateFixture(fixtureDef);
-        return body;
-    },    
+  
+        createCircle : function(entity, definition){
+            var bodyDef = new b2BodyDef;
+            if (entity.isStatic){
+                bodyDef.type = b2Body.b2_staticBody;
+            } else {
+                bodyDef.type = b2Body.b2_dynamicBody;
+            }
+            bodyDef.position.x = entity.x / box2d.scale;
+            bodyDef.position.y = entity.y / box2d.scale;
+        
+            if(entity.angle){
+                bodyDef.angle = Math.PI * entity.angle/180;
+            }
+            var fixtureDef = new b2FixtureDef;
+            fixtureDef.density = definition.density;
+            fixtureDef.friction = definition.friction;
+            fixtureDef.restitution = definition.restitution;
+        
+            fixtureDef.shape = new b2CircleShape(entity.radius/box2d.scale);
+        
+            var body = box2d.world.CreateBody(bodyDef);
+            body.SetUserData(entity);
+        
+            var fixture = body.CreateFixture(fixtureDef);
+            return body;
+    }, 
+    step : function(timeStep) {
+        if(timeStep >2/60){
+            timeStep = 2/60
+          }
+        box2d.world.Step(timeStep,8,3);
+      },   
 }
