@@ -2,6 +2,8 @@ $(window).load(function(){
     game.init();
 });
 
+var superHeroPower = 1;
+
 (function(){
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
@@ -150,6 +152,15 @@ var game={
             }
         }
         if(game.mode == "fired"){
+
+            if(mouse.down && superHeroPower > 0){
+              superHeroPower = 0;
+              var impulseScaleFactor = 0.5;
+              var impulse = new b2Vec2((game.slingshotX+35-mouse.x-game.offsetLeft)*impulseScaleFactor,
+              (game.slingshotY+25-mouse.y)*impulseScaleFactor);
+              game.currentHero.ApplyImpulse(impulse, game.currentHero.GetWorldCenter());
+            }
+
             var heroX = game.currentHero.GetPosition().x*box2d.scale;
             game.panTo(heroX);
       
@@ -162,6 +173,7 @@ var game={
         }
         if (game.mode == "load-next-hero") {
             game.countHerosAndVillains();
+            superHeroPower = 1;
       
             if (game.villains.length == 0) {
               game.mode = "level-success";
@@ -348,7 +360,7 @@ var levels={
         
                 {type:"block", name:"wood", x:620,y:380,angle:90,width:100,height:25},
                 {type:"block", name:"glass", x:620,y:280,angle:90,width:100,height:25},
-                {type:"villain", name:"duende", x:620,y:205,calories:420},
+                {type:"villain", name:"duende", x:620,y:205,calories:150},
         
                 {type:"hero", name:"ironMan",x:80,y:405},
                 {type:"hero", name:"ironMan",x:140,y:405},
@@ -372,8 +384,8 @@ var levels={
                 {type:"block", name:"wood", x:720,y:192.5,width:100,height:25}, 
         
                 {type:"villain", name:"deadpool",x:715,y:155,calories:590},
-                {type:"villain", name:"duende",x:670,y:405,calories:420},
-                {type:"villain", name:"hulk",x:765,y:400,calories:150},
+                {type:"villain", name:"duende",x:670,y:405,calories:150},
+                {type:"villain", name:"hulk",x:765,y:400,calories:400},
         
                 {type:"hero", name:"capitanamerica",x:30,y:415},
                 {type:"hero", name:"ironMan",x:80,y:405},
