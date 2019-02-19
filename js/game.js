@@ -2,6 +2,8 @@ $(window).load(function(){
     game.init();
 });
 
+var superHeroPower = 1;
+
 (function(){
     var lastTime = 0;
     var vendors = ['ms', 'moz', 'webkit', 'o'];
@@ -52,6 +54,11 @@ var game={
         game.canvas = $('#gamecanvas')[0];
         game.context = game.canvas.getContext('2d');
     },
+
+    showSoundButton : function(){
+        $('#soundbutton').show('slow');
+    },
+
     showLevelScreen: function(){
         $('.gamelayer').hide();
         $('#levelselectscreen').show('slow');
@@ -60,14 +67,18 @@ var game={
     slingshotX: 140,
     slingshotY: 280,
     start: function(){
-        $('.gamelayer').hide();
+      
+        $('.gameLayer').hide();       
         $('#gamecanvas').show();
         $('#scorescreen').show();
-
+        $('#endingscreen').hide();
+      
+      
+        
         game.mode = "intro";
         game.offsetLeft = 0;
         game.ended = false;
-        game.animationFrame = window.requestAnimationFrame(game.animate, game.canvas);
+        game.animationFrame = window.requestAnimationFrame(game.animate,game.canvas);
     },
     maxSpeed: 3,
     minOffset: 0,
@@ -127,10 +138,6 @@ var game={
             }
         }
 
-        if(game.mode == "load-next-hero"){
-            game.mode = "wait-for-firing";
-        }
-
         if(game.mode == "firing"){
             if(mouse.down) {
                 game.panTo(game.slingshotX);
@@ -139,14 +146,21 @@ var game={
                 game.mode = "fired";
                 game.slingshotReleasedSound.play();
                 var impulseScaleFactor = 0.75;
-                var slingshotCenterX=game.slingshotX+35;
-                var slingshotCenterY=game.slingshotY+25;
                 var impulse = new b2Vec2((game.slingshotX+35-mouse.x-game.offsetLeft)*impulseScaleFactor,
                 (game.slingshotY+25-mouse.y)*impulseScaleFactor);
                 game.currentHero.ApplyImpulse(impulse, game.currentHero.GetWorldCenter());
             }
         }
         if(game.mode == "fired"){
+
+            if(mouse.down && superHeroPower > 0){
+              superHeroPower = 0;
+              var impulseScaleFactor = 0.5;
+              var impulse = new b2Vec2((game.slingshotX+35-mouse.x-game.offsetLeft)*impulseScaleFactor,
+              (game.slingshotY+25-mouse.y)*impulseScaleFactor);
+              game.currentHero.ApplyImpulse(impulse, game.currentHero.GetWorldCenter());
+            }
+
             var heroX = game.currentHero.GetPosition().x*box2d.scale;
             game.panTo(heroX);
       
@@ -159,6 +173,7 @@ var game={
         }
         if (game.mode == "load-next-hero") {
             game.countHerosAndVillains();
+            superHeroPower = 1;
       
             if (game.villains.length == 0) {
               game.mode = "level-success";
@@ -250,7 +265,7 @@ var game={
         }
         var position = game.currentHero.GetPosition();
         var distanceSquared = Math.pow(position.x*box2d.scale - mouse.x - game.offsetLeft,2)
-          + Math.pow(position.y*box2d.scale-mouse.y,2);
+        + Math.pow(position.y*box2d.scale-mouse.y,2);
         var radiusSquared = Math.pow(game.currentHero.GetUserData().radius,2);
         return (distanceSquared <= radiusSquared);
       },
@@ -341,17 +356,17 @@ var levels={
         
                 {type:"block", name:"wood", x:520,y:380,angle:90,width:100,height:25},
                 {type:"block", name:"glass", x:520,y:280,angle:90,width:100,height:25},
-                {type:"villain", name:"burger",x:520,y:205,calories:590},
+                {type:"villain", name:"deadpool",x:520,y:205,calories:590},
         
                 {type:"block", name:"wood", x:620,y:380,angle:90,width:100,height:25},
                 {type:"block", name:"glass", x:620,y:280,angle:90,width:100,height:25},
-                {type:"villain", name:"fries", x:620,y:205,calories:420},
+                {type:"villain", name:"duende", x:620,y:205,calories:150},
         
-                {type:"hero", name:"orange",x:80,y:405},
-                {type:"hero", name:"apple",x:140,y:405},
+                {type:"hero", name:"ironMan",x:80,y:405},
+                {type:"hero", name:"ironMan",x:140,y:405},
             ]
         },
-          { //segundo nivel
+        { //segundo nivel
             foreground : 'desert-foreground',
             background : 'clouds-background',
             entities : [
@@ -368,17 +383,60 @@ var levels={
                 {type:"block", name:"glass", x:770,y:255,angle:90,width:100,height:25},
                 {type:"block", name:"wood", x:720,y:192.5,width:100,height:25}, 
         
-                {type:"villain", name:"burger",x:715,y:155,calories:590},
-                {type:"villain", name:"fries",x:670,y:405,calories:420},
-                {type:"villain", name:"sodacan",x:765,y:400,calories:150},
+                {type:"villain", name:"deadpool",x:715,y:155,calories:590},
+                {type:"villain", name:"duende",x:670,y:405,calories:150},
+                {type:"villain", name:"hulk",x:765,y:400,calories:400},
         
-                {type:"hero", name:"strawberry",x:30,y:415},
-                {type:"hero", name:"orange",x:80,y:405},
-                {type:"hero", name:"apple",x:140,y:405},
+                {type:"hero", name:"capitanamerica",x:30,y:415},
+                {type:"hero", name:"ironMan",x:80,y:405},
+                {type:"hero", name:"spiderMan",x:140,y:405},
             ]
-          }
-    ],
+        },
+        { // tercer nivel
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+            {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+            {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
+    
+            {type:"block", name:"glass", x:820,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:720,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:620,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:670,y:317.5,width:100,height:25},
+            {type:"block", name:"glass", x:770,y:317.5,width:100,height:25}, 
 
+            {type:"block", name:"wood", x:670,y:300,angle:90,width:100,height:25},
+            {type:"block", name:"wood", x:770,y:300,angle:90,width:100,height:25},
+            {type:"block", name:"wood", x:720,y:240,width:150,height:25},
+                 
+    
+            {type:"block", name:"wood", x:500,y:380,angle:90,width:300,height:25},
+            {type:"block", name:"wood", x:900,y:380,angle:90,width:300,height:25},
+            {type:"block", name:"wood", x:750,y:150,width:600,height:25},
+            
+            {type:"villain", name:"deadpool",x:670,y:405,calories:420},
+            {type:"villain", name:"duende",x:765,y:400,calories:150},
+            {type:"villain", name:"hulk",x:720,y:270,calories:400},
+    
+            {type:"hero", name:"capitanamerica",x:30,y:415},
+            {type:"hero", name:"pineironMan",x:80,y:415},
+            ],
+        },
+        {  // cuarto nivel
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+          
+            ],
+        },
+        { //quinto nivel           
+            foreground : 'desert-foreground',
+            background : 'clouds-background',
+            entities : [
+           
+          ],
+        }
+    ],
     init:function(){
         var html="";
         for (var  i = 0; i < levels.data.length; i++) {
@@ -480,7 +538,7 @@ var mouse = {
         var offset = $('#gamecanvas').offset();
 
         mouse.x = ev.pageX - offset.left;
-        mouse.y = ev.pagey - offset.top;
+        mouse.y = ev.pageY - offset.top;
 
         if(mouse.down){
             mouse.dragging = true;
@@ -517,7 +575,7 @@ var entities = {
         friction : 1.5,
         restitution : 0.2,
       },
-      "burger" : {
+      "deadpool" : {
         shape : "circle",
         fullHealth : 40,
         radius : 25,
@@ -525,7 +583,7 @@ var entities = {
         friction : 0.5,
         restitution : 0.4,
       },
-      "sodacan" : {
+      "hulk" : {
         shape : "rectangle",
         fullHealth : 80,
         width : 40,
@@ -534,7 +592,7 @@ var entities = {
         friction : 0.5,
         restitution : 0.7,
       },
-      "fries" : {
+      "duende" : {
         shape : "rectangle",
         fullHealth : 50,
         width : 40,
@@ -543,21 +601,21 @@ var entities = {
         friction : 0.5,
         restitution : 0.6,
       },
-      "apple" : {
+      "ironMan" : {
         shape : "circle",
         radius : 25,
         density : 1.5,
         friction : 0.5,
         restitution : 0.4,
       },
-      "orange" : {
+      "ironMan" : {
         shape : "circle",
         radius : 25,
         density : 1.5,
         friction : 0.5,
         restitution : 0.4,
       },
-      "strawberry" : {
+      "capitanamerica" : {
         shape : "circle",
         radius : 15,
         density : 2.0,
@@ -597,7 +655,7 @@ var entities = {
           return;
         }
         switch(entity.type){
-          case "block":
+            case "block":
             entity.health = definition.fullHealth;
             entity.fullHealth = definition.fullHealth;
             entity.shape = "rectangle"; 
@@ -605,11 +663,12 @@ var entities = {
             //entity.breakSound = game.breakSound[entity.name];
             box2d.createRectangle(entity, definition);
             break;
-          case "ground":     
-            entity.shape = "rectangle";    
+          case "ground":
+            entity.shape = "rectangle";
             box2d.createRectangle(entity, definition);
             break;
-          case "hero":            
+          case "hero":
+            
           case "villain": 
             entity.health = definition.fullHealth;
             entity.fullHealth = definition.fullHealth;
@@ -631,8 +690,30 @@ var entities = {
         }
       },
       
-    draw:function(enttity,position,angle){
+    draw:function(entity,position,angle){
+        game.context.translate(position.x*box2d.scale-game.offsetLeft, position.y*box2d.scale);
+        game.context.rotate(angle);
+        switch (entity.type){
+        case "block":
+            game.context.drawImage(entity.sprite,0,0,entity.sprite.width,entity.sprite.height,
+                -entity.width/2-1,-entity.height/2-1,entity.width+2,entity.height+2); 
+        break;
+        case "villain":
+        case "hero":
+            if (entity.shape == "circle") {
+            game.context.drawImage(entity.sprite,0,0,entity.sprite.width,entity.sprite.height,
+                -entity.radius-1,-entity.radius-1,entity.radius*2+2,entity.radius*2+2); 
+            } else if (entity.shape=="rectangle") {
+            game.context.drawImage(entity.sprite,0,0,entity.sprite.width,entity.sprite.height,
+                -entity.width/2-1,-entity.height/2-1,entity.width+2,entity.height+2);
+            }
+        break;
+        case "ground":
+        break;
+        }
 
+        game.context.rotate(-angle);
+        game.context.translate(-position.x*box2d.scale+game.offsetLeft,-position.y*box2d.scale);
     }
 }
 var b2Vec2 = Box2D.Common.Math.b2Vec2;
