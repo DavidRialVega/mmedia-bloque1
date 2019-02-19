@@ -356,7 +356,7 @@ var levels={
         
                 {type:"block", name:"wood", x:520,y:380,angle:90,width:100,height:25},
                 {type:"block", name:"glass", x:520,y:280,angle:90,width:100,height:25},
-                {type:"villain", name:"deadpool",x:520,y:205,calories:590},
+                {type:"villain", name:"deadpool",x:520,y:205,calories:420},
         
                 {type:"block", name:"wood", x:620,y:380,angle:90,width:100,height:25},
                 {type:"block", name:"glass", x:620,y:280,angle:90,width:100,height:25},
@@ -383,7 +383,7 @@ var levels={
                 {type:"block", name:"glass", x:770,y:255,angle:90,width:100,height:25},
                 {type:"block", name:"wood", x:720,y:192.5,width:100,height:25}, 
         
-                {type:"villain", name:"deadpool",x:715,y:155,calories:590},
+                {type:"villain", name:"deadpool",x:715,y:155,calories:420},
                 {type:"villain", name:"duende",x:670,y:405,calories:150},
                 {type:"villain", name:"hulk",x:765,y:400,calories:400},
         
@@ -426,14 +426,48 @@ var levels={
             foreground : 'desert-foreground',
             background : 'clouds-background',
             entities : [
-          
+              {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+              {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
+      
+              {type:"block", name:"wood", x:320,y:380,angle:90,width:300,height:25},
+
+              {type:"block", name:"wood", x:420,y:380,angle:90,width:100,height:25},
+              {type:"block", name:"glass", x:420,y:280,angle:90,width:100,height:25},
+              {type:"villain", name:"deadpool",x:420,y:205,calories:420},
+
+              {type:"block", name:"wood", x:720,y:380,angle:90,width:300,height:25},
+      
+              {type:"block", name:"wood", x:820,y:380,angle:90,width:100,height:25},
+              {type:"block", name:"glass", x:820,y:280,angle:90,width:100,height:25},
+              {type:"villain", name:"duende", x:820,y:205,calories:150},
+      
+              {type:"hero", name:"ironMan",x:80,y:405},
             ],
         },
         { //quinto nivel           
-            foreground : 'desert-foreground',
-            background : 'clouds-background',
-            entities : [
-           
+          foreground : 'desert-foreground',
+          background : 'clouds-background',
+          entities : [
+            {type:"ground", name:"dirt", x:500,y:440,width:1000,height:20,isStatic:true},
+            {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
+        
+            {type:"block", name:"wood", x:420,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:420,y:280,angle:90,width:100,height:25},
+            {type:"villain", name:"deadpool",x:420,y:205,calories:420},        
+    
+            {type:"block", name:"glass", x:720,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:620,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:520,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:570,y:317.5,width:100,height:25},
+            {type:"block", name:"glass", x:670,y:317.5,width:100,height:25}, 
+            {type:"villain", name:"deadpool",x:670,y:405,calories:420},
+            {type:"villain", name:"duende",x:570,y:405,calories:150},
+
+            {type:"block", name:"wood", x:820,y:380,angle:90,width:100,height:25},
+            {type:"block", name:"glass", x:820,y:280,angle:90,width:100,height:25},
+            {type:"villain", name:"duende", x:820,y:205,calories:150},
+    
+            {type:"hero", name:"ironMan",x:80,y:405},
           ],
         }
     ],
