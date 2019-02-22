@@ -367,6 +367,7 @@ var levels={
             ]
         },
         { //segundo nivel
+           
             foreground : 'desert-foreground',
             background : 'clouds-background',
             entities : [
