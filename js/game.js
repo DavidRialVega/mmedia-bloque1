@@ -323,7 +323,16 @@ var game={
     },
     startBackgroundMusic : function(){
         var toggleImage = $("#togglemusic")[0];        
-        game.backgroundMusic.play();        
+        var playPromise = game.backgroundMusic.play();   
+        if (playPromise !== undefined) {
+          playPromise.then(_ => {
+            game.backgroundMusic.play();   
+          })
+          .catch(error => {
+            game.backgroundMusic.play();   
+          });
+        }
+             
         toggleImage.src = "images/icons/sound.png";
     },
     stopBackgroundMusic : function(){
