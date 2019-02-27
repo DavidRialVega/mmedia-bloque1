@@ -47,10 +47,10 @@ var game={
         };
     
 
-        //Oculta todas las capas del juego y muestra la pantalla de inicio
+       
         $('.gamelayer').hide();
-        $('#gamestartscreen').show();
-        //Obtener el controlador para el canvas y el contexto del juego
+        $('#soundbutton').hide();
+        $('#gamestartscreen').show();       
         game.canvas = $('#gamecanvas')[0];
         game.context = game.canvas.getContext('2d');
     },
@@ -58,7 +58,6 @@ var game={
     showSoundButton : function(){
         $('#soundbutton').show('slow');
     },
-
     showLevelScreen: function(){
         $('.gamelayer').hide();
         $('#levelselectscreen').show('slow');
@@ -363,7 +362,7 @@ var levels={
                 {type:"villain", name:"duende", x:620,y:205,calories:150},
         
                 {type:"hero", name:"ironMan",x:80,y:405},
-                {type:"hero", name:"ironMan",x:140,y:405},
+                {type:"hero", name:"capitanamerica",x:140,y:415},
             ]
         },
         { //segundo nivel
@@ -420,7 +419,7 @@ var levels={
             {type:"villain", name:"hulk",x:720,y:270,calories:400},
     
             {type:"hero", name:"capitanamerica",x:30,y:415},
-            {type:"hero", name:"pineironMan",x:80,y:415},
+            {type:"hero", name:"ironMan",x:80,y:405},
             ],
         },
         {  // cuarto nivel
@@ -442,7 +441,8 @@ var levels={
               {type:"block", name:"glass", x:820,y:280,angle:90,width:100,height:25},
               {type:"villain", name:"duende", x:820,y:205,calories:150},
       
-              {type:"hero", name:"ironMan",x:80,y:405},
+              {type:"hero", name:"spiderMan",x:50,y:405},
+              {type:"hero", name:"capitanamerica",x:30,y:415},
             ],
         },
         { //quinto nivel           
